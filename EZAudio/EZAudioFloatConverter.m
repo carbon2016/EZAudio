@@ -213,13 +213,27 @@ OSStatus EZAudioFloatConverterCallback(AudioConverterRef             inAudioConv
         //
         // Fill out the audio converter with the source buffer
         //
-        [EZAudioUtilities checkResult:AudioConverterFillComplexBuffer(self.info->converterRef,
+        
+        /*[EZAudioUtilities checkResult:AudioConverterFillComplexBuffer(self.info->converterRef,
                                                                       EZAudioFloatConverterCallback,
                                                                       audioBufferList,
                                                                       &frames,
                                                                       self.info->floatAudioBufferList,
                                                                       packetDescriptions ? packetDescriptions : self.info->packetDescriptions)
-                            operation:"Failed to fill complex buffer in float converter"];
+                            operation:"Failed to fill complex buffer in float converter"];*/
+        
+        // ----- fix - iOS 13
+        // Error: Failed to fill complex buffer in float converter ('insz’)
+        OSStatus status = AudioConverterFillComplexBuffer(self.info->converterRef,
+                                                          EZAudioFloatConverterCallback,
+                                                          audioBufferList,
+                                                          &frames,
+                                                          self.info->floatAudioBufferList,
+                                                          packetDescriptions ? packetDescriptions : self.info->packetDescriptions);
+        if (status > 0 ) {
+            AudioConverterReset(self.info->converterRef);
+        }
+        
         
         //
         // Copy the converted buffers into the float buffer array stored
